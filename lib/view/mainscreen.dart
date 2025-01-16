@@ -12,6 +12,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   String ImgURL="";
   int? memeNo=0;
+  bool isLoading= true;
+  int targetMeme=100;
 
   @override
   void initState() {
@@ -23,7 +25,13 @@ class _MainScreenState extends State<MainScreen> {
 
    GetInitMemeNo() async
   {
+
      memeNo = await SaveMyData.getData() ?? 0;
+     if(memeNo!>targetMeme)
+       {
+         targetMeme+=500;
+       }
+
      print(memeNo);
      setState(() {
 
@@ -35,6 +43,7 @@ class _MainScreenState extends State<MainScreen> {
     String getImgURL= await FetchMeme().fetchNewMeme();
     setState(() {
       ImgURL=getImgURL;
+      isLoading=false;
     });
   }
   @override
@@ -47,8 +56,14 @@ class _MainScreenState extends State<MainScreen> {
           SizedBox(height: 120,),
           Text("Meme # $memeNo",style: TextStyle(fontSize: 35,fontWeight: FontWeight.bold)),
           SizedBox(height: 20),
-          Text("Target 230" ,style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
+          Text("Target $targetMeme" ,style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
           SizedBox(height: 20),
+          isLoading ?
+              Container(
+                  height: 400, width: MediaQuery.of(context).size.width,
+                child: Center(child: SizedBox(height:40, width: 40, child: CircularProgressIndicator()),),
+              )
+              :
           Image.network(height: 400, width: MediaQuery.of(context).size.width,fit:BoxFit.fitHeight  , ImgURL),
           SizedBox(height: 20),
           ElevatedButton( onPressed: () async{
